@@ -16,14 +16,24 @@ node {
        def app = docker.build("cbinh951/docker-nodejs-demo:${commit_id}", '.').push()
      }
    }
-  stage('Run App') {
-     sh "ssh -i /var/jenkins_home/key-server/web-server.pem -o StrictHostKeyChecking=no www-user@172.31.31.223"
-     sh "docker pull cbinh951/docker-nodejs-demo:${commit_id}"
-     sh 'docker stop docker-nodejs-demo'
-     sh 'docker rm docker-nodejs-demo'
-     sh 'docker rmi cbinh951/docker-nodejs-demo:current'
-     sh "docker tag cbinh951/docker-nodejs-demo:${commit_id} cbinh951/docker-nodejs-demo:current"
-     sh "docker run -d --name docker-nodejs-demo -p 3000:3000 cbinh951/docker-nodejs-demo:current"
-     echo "Application started on port: 3000 (http)"
+  //   stage('Run App') {
+  //    sh "docker pull cbinh951/docker-nodejs-demo:${commit_id}"
+  //    sh 'docker stop docker-nodejs-demo'
+  //    sh 'docker rm docker-nodejs-demo'
+  //    sh 'docker rmi cbinh951/docker-nodejs-demo:current'
+  //    sh "docker tag cbinh951/docker-nodejs-demo:${commit_id} cbinh951/docker-nodejs-demo:current"
+  //    sh "docker run -d --name docker-nodejs-demo -p 3000:3000 cbinh951/docker-nodejs-demo:current"
+  //    echo "Application started on port: 3000 (http)"
+  //  }
+    stage('SSH Server') {
+     sshagent(['ssh-remote']) {
+        sh 'ssh -o StrictHostKeyChecking=no -l www-user 172.31.31.223'
+        sh "docker pull cbinh951/docker-nodejs-demo:${commit_id}"
+        sh 'docker stop docker-nodejs-demo'
+        sh 'docker rm docker-nodejs-demo'
+        sh 'docker rmi cbinh951/docker-nodejs-demo:current'
+        sh "docker tag cbinh951/docker-nodejs-demo:${commit_id} cbinh951/docker-nodejs-demo:current"
+        sh "docker run -d --name docker-nodejs-demo -p 3000:3000 cbinh951/docker-nodejs-demo:current"
+      }
    }
 }
