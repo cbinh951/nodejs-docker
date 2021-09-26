@@ -17,6 +17,7 @@ node {
      }
    }
   stage('Run App') {
+     sh "ssh -i /var/jenkins_home/key-server/web-server.pem -o StrictHostKeyChecking=no www-user@172.31.31.223"
      sh "docker pull cbinh951/docker-nodejs-demo:${commit_id}"
      sh 'docker stop docker-nodejs-demo'
      sh 'docker rm docker-nodejs-demo'
